@@ -23,6 +23,7 @@ export default function App() {
 
   // Custom Notifications/Toasts state
   const [notifications, setNotifications] = useState([]);
+  const [categories, setCategories] = useState([]);
 
   // Load token/user from local storage on startup
   useEffect(() => {
@@ -71,9 +72,22 @@ export default function App() {
     }
   };
 
+  // Fetch all categories from backend database
+  const fetchCategories = async () => {
+    try {
+      const response = await API.get('/categories');
+      if (Array.isArray(response.data)) {
+        setCategories(response.data.map((c) => c.name));
+      }
+    } catch (error) {
+      console.error('Erro ao carregar categorias no App:', error);
+    }
+  };
+
   // Load products on start and when switching tabs to synchronize
   useEffect(() => {
     fetchProducts();
+    fetchCategories();
   }, [currentTab]);
 
   const handleOpenAddModal = () => {
@@ -86,8 +100,7 @@ export default function App() {
     setIsFormOpen(true);
   };
 
-  // Extract unique categories dynamically from products
-  const categories = Array.from(new Set(products.map((p) => p.category))).filter(Boolean);
+
 
   return (
     <div className="flex flex-col min-h-screen bg-[#F9FAFB] text-[#1F2937] selection:bg-black selection:text-white">

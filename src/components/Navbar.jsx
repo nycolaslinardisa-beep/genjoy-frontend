@@ -19,10 +19,7 @@ export default function Navbar({
 
   const quickLinks = [
     { label: 'PRODUTOS', value: '' },
-    { label: 'POCO', value: 'POCO' },
-    { label: 'REALME', value: 'REALME' },
-    { label: 'REDMI', value: 'REDMI' },
-    { label: 'TCL', value: 'TCL' }
+    ...categories.map(cat => ({ label: cat, value: cat }))
   ];
 
   return (
