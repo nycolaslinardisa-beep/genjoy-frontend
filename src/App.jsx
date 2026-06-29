@@ -146,11 +146,11 @@ export default function App() {
       </main>
 
       {/* Footer */}
-      <footer className="border-t border-slate-200 bg-white py-6 text-center text-xs text-slate-500">
-        <div className="container mx-auto px-4 space-y-2">
-          <p>© {new Date().getFullYear()} GENJOY CELULARES & ACESSÓRIOS. Desenvolvido com Node.js, Express, React e Tailwind CSS.</p>
-          <p className="text-[10px] text-slate-400">
-            Contato e Pedidos: <a href="https://wa.me/556499731390" target="_blank" rel="noopener noreferrer" className="hover:text-emerald-600 font-semibold underline">WhatsApp</a> | <a href="https://www.instagram.com/genjoybr?igsh=MXRncmUwbjlzemt3NA==" target="_blank" rel="noopener noreferrer" className="hover:text-orange-600 font-semibold underline">Instagram @genjoybr</a>
+      <footer className="border-t border-slate-200 bg-white py-6 text-xs text-slate-500">
+        <div className="container mx-auto px-4 flex flex-col items-center text-center gap-3 md:flex-row md:justify-between">
+          <p>© {new Date().getFullYear()} GENJOY CELULARES & ACESSÓRIOS.</p>
+          <p className="text-slate-400">
+            Contato e Pedidos: <a href="https://wa.me/556499731390" target="_blank" rel="noopener noreferrer" className="hover:text-emerald-600 font-semibold underline">Fale Conosco no WhatsApp</a> | <a href="https://www.instagram.com/genjoybr?igsh=MXRncmUwbjlzemt3NA==" target="_blank" rel="noopener noreferrer" className="hover:text-orange-600 font-semibold underline">Siga nosso Instagram @genjoybr</a>
           </p>
         </div>
       </footer>

@@ -12,6 +12,7 @@ export default function Catalog({
 }) {
   const [promoFilter, setPromoFilter] = useState('all');
   const [sortBy, setSortBy] = useState('default');
+  const [isOpen, setIsOpen] = useState(false);
 
   // Filter products
   const filteredProducts = products.filter((p) => {
@@ -84,36 +85,55 @@ export default function Catalog({
           <aside className="lg:col-span-1 bg-white p-6 rounded-2xl border border-slate-100 shadow-sm h-fit space-y-6">
             {/* Categories Sidebar Filter */}
             <div>
-              <h3 className="text-xs font-bold text-slate-900 uppercase tracking-wider mb-4">
-                Categorias
-              </h3>
-              <div className="flex flex-col gap-3">
-                {/* Option: All */}
-                <label className="flex items-center gap-3 cursor-pointer text-sm font-medium text-slate-600 select-none hover:text-black transition-colors">
-                  <input
-                    type="checkbox"
-                    checked={selectedCategory === ''}
-                    onChange={() => setSelectedCategory('')}
-                    className="w-4.5 h-4.5 rounded border-slate-350 text-black focus:ring-black accent-black cursor-pointer"
-                  />
-                  <span>Todos os produtos</span>
-                </label>
-
-                {/* Dynamic categories from DB */}
-                {categories.map((cat) => (
-                  <label
-                    key={cat}
-                    className="flex items-center gap-3 cursor-pointer text-sm font-medium text-slate-600 select-none hover:text-black transition-colors"
-                  >
+              <button
+                onClick={() => setIsOpen(!isOpen)}
+                className="w-full flex items-center justify-between text-left lg:pointer-events-none focus:outline-none"
+              >
+                <h3 className="text-xs font-bold text-slate-900 uppercase tracking-wider">
+                  Categorias
+                </h3>
+                <svg
+                  className={`w-4 h-4 text-slate-500 transition-transform duration-200 lg:hidden ${
+                    isOpen ? 'rotate-180' : 'rotate-0'
+                  }`}
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+                </svg>
+              </button>
+              
+              <div className={`${isOpen ? 'block' : 'hidden'} lg:block mt-4`}>
+                <div className="flex flex-col gap-3">
+                  {/* Option: All */}
+                  <label className="flex items-center gap-3 cursor-pointer text-sm font-medium text-slate-600 select-none hover:text-black transition-colors">
                     <input
                       type="checkbox"
-                      checked={selectedCategory.toLowerCase() === cat.toLowerCase()}
-                      onChange={() => setSelectedCategory(selectedCategory.toLowerCase() === cat.toLowerCase() ? '' : cat)}
+                      checked={selectedCategory === ''}
+                      onChange={() => setSelectedCategory('')}
                       className="w-4.5 h-4.5 rounded border-slate-350 text-black focus:ring-black accent-black cursor-pointer"
                     />
-                    <span>{cat}</span>
+                    <span>Todos os produtos</span>
                   </label>
-                ))}
+
+                  {/* Dynamic categories from DB */}
+                  {categories.map((cat) => (
+                    <label
+                      key={cat}
+                      className="flex items-center gap-3 cursor-pointer text-sm font-medium text-slate-600 select-none hover:text-black transition-colors"
+                    >
+                      <input
+                        type="checkbox"
+                        checked={selectedCategory.toLowerCase() === cat.toLowerCase()}
+                        onChange={() => setSelectedCategory(selectedCategory.toLowerCase() === cat.toLowerCase() ? '' : cat)}
+                        className="w-4.5 h-4.5 rounded border-slate-350 text-black focus:ring-black accent-black cursor-pointer"
+                      />
+                      <span>{cat}</span>
+                    </label>
+                  ))}
+                </div>
               </div>
             </div>
 
