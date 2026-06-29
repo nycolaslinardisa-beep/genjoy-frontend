@@ -141,7 +141,7 @@ export default function Navbar({
               href="https://www.instagram.com/genjoybr?igsh=MXRncmUwbjlzemt3NA=="
               target="_blank"
               rel="noopener noreferrer"
-              className="p-2 text-slate-650 hover:text-black transition-colors"
+              className="p-2 text-slate-650 hover:text-black transition-colors hidden md:inline-flex"
               title="Siga-nos no Instagram"
             >
               <svg className="w-5 h-5 stroke-current" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -156,7 +156,7 @@ export default function Navbar({
               href="https://wa.me/556499731390"
               target="_blank"
               rel="noopener noreferrer"
-              className="p-2 text-slate-655 hover:text-emerald-600 transition-colors"
+              className="p-2 text-slate-655 hover:text-emerald-600 transition-colors hidden md:inline-flex"
               title="Fale conosco no WhatsApp"
             >
               <svg className="w-5 h-5 fill-current" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
