@@ -1,4 +1,5 @@
 import React from 'react';
+import logo from '../assets/logo.jpeg';
 
 export default function Navbar({
   currentTab,
@@ -26,24 +27,33 @@ export default function Navbar({
 
   return (
     <header className="sticky top-0 z-50 w-full bg-white border-b border-slate-100 transition-all duration-300">
+      {/* Slogan Top Bar */}
+      <div className="bg-black text-white text-[10px] sm:text-xs font-semibold py-2 text-center tracking-wider">
+        Otimizando você! | Especialistas em tecnologia
+      </div>
       <div className="container mx-auto px-4">
         {/* Top Header Row */}
         <div className="h-16 flex items-center justify-between gap-4">
           {/* Logo */}
           <div
-            className="flex items-center gap-2 cursor-pointer group shrink-0"
+            className="flex items-center gap-3 cursor-pointer group shrink-0"
             onClick={() => {
               setCurrentTab('catalog');
               setSelectedCategory('');
               setSearchQuery('');
             }}
           >
-            <div className="w-9 h-9 rounded bg-black flex items-center justify-center group-hover:opacity-90 transition-opacity">
-              <span className="font-extrabold text-white text-base select-none">G</span>
-            </div>
-            <div>
-              <span className="font-black text-lg text-black uppercase tracking-wider">
-                Genjoy
+            <img 
+              src={logo} 
+              alt="GENJOY CELULARES & ACESSÓRIOS" 
+              className="w-10 h-10 rounded-full object-cover border border-slate-100 group-hover:opacity-90 transition-opacity" 
+            />
+            <div className="flex flex-col">
+              <span className="font-black text-sm sm:text-base text-black uppercase tracking-wider leading-none">
+                GENJOY
+              </span>
+              <span className="text-[9px] font-bold text-slate-500 uppercase tracking-widest leading-none mt-1">
+                CELULARES & ACESSÓRIOS
               </span>
             </div>
           </div>

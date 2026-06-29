@@ -133,7 +133,7 @@ export default function App() {
       {/* Footer */}
       <footer className="border-t border-slate-200 bg-white py-6 text-center text-xs text-slate-500">
         <div className="container mx-auto px-4 space-y-2">
-          <p>© {new Date().getFullYear()} Genjoy Catalog. Desenvolvido com Node.js, Express, React e Tailwind CSS.</p>
+          <p>© {new Date().getFullYear()} GENJOY CELULARES & ACESSÓRIOS. Desenvolvido com Node.js, Express, React e Tailwind CSS.</p>
           <p className="text-[10px] text-slate-400">
             Contato e Pedidos: <a href="https://wa.me/556499731390" target="_blank" rel="noopener noreferrer" className="hover:text-emerald-600 font-semibold underline">WhatsApp</a> | <a href="https://www.instagram.com/genjoybr?igsh=MXRncmUwbjlzemt3NA==" target="_blank" rel="noopener noreferrer" className="hover:text-orange-600 font-semibold underline">Instagram @genjoybr</a>
           </p>
