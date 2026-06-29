@@ -139,6 +139,8 @@ export default function App() {
             loading={loading}
             fetchProducts={fetchProducts}
             addNotification={addNotification}
+            currentUser={currentUser}
+            setCurrentUser={setCurrentUser}
           />
         )}
       </main>

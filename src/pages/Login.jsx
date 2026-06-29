@@ -11,6 +11,11 @@ export default function Login({ onAuthSuccess, addNotification }) {
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
 
+  // 2FA state variables
+  const [requires2FA, setRequires2FA] = useState(false);
+  const [tempToken, setTempToken] = useState('');
+  const [totpToken, setTotpToken] = useState('');
+
   const validate = () => {
     const tempErrors = {};
     if (isRegister && !formData.name.trim()) {
@@ -65,11 +70,17 @@ export default function Login({ onAuthSuccess, addNotification }) {
           password: formData.password,
         });
 
-        localStorage.setItem('genjoy_token', response.data.token);
-        localStorage.setItem('genjoy_user', JSON.stringify(response.data.user));
+        if (response.data.requires2FA) {
+          setRequires2FA(true);
+          setTempToken(response.data.tempToken);
+          addNotification('Autenticação de dois fatores requerida. Insira o código de 6 dígitos.', 'info');
+        } else {
+          localStorage.setItem('genjoy_token', response.data.token);
+          localStorage.setItem('genjoy_user', JSON.stringify(response.data.user));
 
-        addNotification('Login realizado com sucesso!', 'success');
-        onAuthSuccess(response.data.user);
+          addNotification('Login realizado com sucesso!', 'success');
+          onAuthSuccess(response.data.user);
+        }
       }
     } catch (error) {
       console.error('Erro na autenticação:', error);
@@ -79,6 +90,88 @@ export default function Login({ onAuthSuccess, addNotification }) {
       setLoading(false);
     }
   };
+
+  const handle2FASubmit = async (e) => {
+    e.preventDefault();
+    if (!totpToken || totpToken.length !== 6) {
+      addNotification('O código de verificação deve conter 6 dígitos.', 'error');
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const response = await API.post('/auth/2fa/login-2fa', {
+        tempToken,
+        token: totpToken
+      });
+
+      localStorage.setItem('genjoy_token', response.data.token);
+      localStorage.setItem('genjoy_user', JSON.stringify(response.data.user));
+
+      addNotification('Login realizado com sucesso!', 'success');
+      onAuthSuccess(response.data.user);
+    } catch (error) {
+      console.error('Erro no login 2FA:', error);
+      const errMsg = error.response?.data?.error || 'Código 2FA inválido ou expirado.';
+      addNotification(errMsg, 'error');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (requires2FA) {
+    return (
+      <div className="container mx-auto px-4 py-16 flex justify-center items-center">
+        <div className="w-full max-w-md bg-white border border-slate-200 rounded-2xl shadow-xl overflow-hidden p-8">
+          <div className="text-center mb-6">
+            <h2 className="text-2xl font-bold text-[#202020] mb-2">
+              Autenticação de Duas Etapas
+            </h2>
+            <p className="text-xs text-slate-500">
+              Digite o código de verificação de 6 dígitos gerado pelo seu aplicativo Google Authenticator.
+            </p>
+          </div>
+
+          <form onSubmit={handle2FASubmit} className="space-y-5">
+            <div>
+              <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2 text-center">
+                Código de 6 Dígitos
+              </label>
+              <input
+                type="text"
+                maxLength="6"
+                value={totpToken}
+                onChange={(e) => setTotpToken(e.target.value.replace(/\D/g, ''))}
+                placeholder="000000"
+                className="w-full bg-slate-50 border border-slate-200 focus:border-[#202020] focus:bg-white rounded-xl px-4 py-3 text-center text-2xl font-black tracking-widest text-slate-800 focus:outline-none focus:ring-1 focus:ring-[#202020]/20 transition-all"
+              />
+            </div>
+
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full py-3 px-4 rounded-xl bg-[#202020] hover:bg-black disabled:bg-[#202020]/50 text-white font-bold text-sm shadow-sm transition-all flex items-center justify-center gap-2"
+            >
+              {loading && <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>}
+              Verificar e Entrar
+            </button>
+
+            <button
+              type="button"
+              onClick={() => {
+                setRequires2FA(false);
+                setTempToken('');
+                setTotpToken('');
+              }}
+              className="w-full text-center text-xs text-slate-400 hover:text-slate-600 transition-colors mt-2"
+            >
+              Voltar para o Login
+            </button>
+          </form>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="container mx-auto px-4 py-16 flex justify-center items-center">
