@@ -112,7 +112,10 @@ export default function Catalog({
                     <input
                       type="checkbox"
                       checked={selectedCategory === ''}
-                      onChange={() => setSelectedCategory('')}
+                      onChange={() => {
+                        setSelectedCategory('');
+                        setIsOpen(false);
+                      }}
                       className="w-4.5 h-4.5 rounded border-slate-350 text-black focus:ring-black accent-black cursor-pointer"
                     />
                     <span>Todos os produtos</span>
@@ -127,7 +130,10 @@ export default function Catalog({
                       <input
                         type="checkbox"
                         checked={selectedCategory.toLowerCase() === cat.toLowerCase()}
-                        onChange={() => setSelectedCategory(selectedCategory.toLowerCase() === cat.toLowerCase() ? '' : cat)}
+                        onChange={() => {
+                          setSelectedCategory(selectedCategory.toLowerCase() === cat.toLowerCase() ? '' : cat);
+                          setIsOpen(false);
+                        }}
                         className="w-4.5 h-4.5 rounded border-slate-350 text-black focus:ring-black accent-black cursor-pointer"
                       />
                       <span>{cat}</span>

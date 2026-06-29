@@ -80,26 +80,6 @@ export default function Navbar({
 
           {/* Right Action Icons */}
           <div className="flex items-center gap-2 sm:gap-4 shrink-0">
-            {/* Search Bar Icon for Mobile */}
-            <div className="block md:hidden relative flex items-center max-w-[150px] sm:max-w-xs">
-              <input
-                type="text"
-                value={searchQuery}
-                onChange={(e) => {
-                  setSearchQuery(e.target.value);
-                  if (currentTab !== 'catalog') {
-                    setCurrentTab('catalog');
-                  }
-                }}
-                placeholder="Buscar..."
-                className="w-full bg-slate-50 border border-slate-200 text-slate-900 rounded-full px-4 py-1.5 text-xs focus:outline-none focus:border-black focus:bg-white transition-all pr-8"
-              />
-              <button className="absolute right-1 w-6 h-6 bg-black text-white rounded-full flex items-center justify-center">
-                <svg className="w-2.5 h-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-                </svg>
-              </button>
-            </div>
 
             {/* Admin toggle button */}
             <button
@@ -186,8 +166,31 @@ export default function Navbar({
           </div>
         </div>
 
+        {/* Mobile Search Bar Row */}
+        <div className="pb-3 md:hidden">
+          <div className="relative flex items-center w-full">
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => {
+                setSearchQuery(e.target.value);
+                if (currentTab !== 'catalog') {
+                  setCurrentTab('catalog');
+                }
+              }}
+              placeholder="O que você procura?"
+              className="w-full bg-slate-50 border border-slate-200 text-slate-900 rounded-full px-5 py-2 text-sm focus:outline-none focus:border-black focus:bg-white transition-all pr-12"
+            />
+            <button className="absolute right-1 w-8 h-8 bg-black text-white rounded-full hover:bg-neutral-800 transition-colors flex items-center justify-center">
+              <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+              </svg>
+            </button>
+          </div>
+        </div>
+
         {/* Categories Underbar Row */}
-        <div className="flex items-center justify-center gap-8 py-3 border-t border-slate-100 text-xs font-bold uppercase tracking-wider text-slate-500">
+        <div className="hidden md:flex items-center justify-center gap-8 py-3 border-t border-slate-100 text-xs font-bold uppercase tracking-wider text-slate-500">
           {quickLinks.map((link) => {
             // Match empty string as empty, otherwise match brand case-insensitively
             const isActive = link.value === '' 
