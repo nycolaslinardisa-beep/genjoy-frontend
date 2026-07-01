@@ -126,14 +126,20 @@ export default function Navbar({
             )}
 
             {/* Shopping Cart Icon with Badge */}
-            <div className="relative p-2 text-slate-600 hover:text-black cursor-pointer transition-colors group">
+            <a
+              href="https://wa.me/556499731390"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="relative p-2 text-slate-600 hover:text-black cursor-pointer transition-colors group flex items-center justify-center"
+              title="Sua Sacola / Carrinho no WhatsApp"
+            >
               <svg className="w-5 h-5 stroke-current group-hover:scale-105 transition-transform" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path>
               </svg>
               <span className="absolute -top-1 -right-2 bg-black text-white text-[10px] w-4 h-4 rounded-full flex items-center justify-center font-bold">
                 2
               </span>
-            </div>
+            </a>
 
             {/* Instagram Link Button */}
             <a
@@ -158,8 +164,8 @@ export default function Navbar({
               className="p-2 text-slate-600 hover:text-emerald-600 transition-colors hidden md:inline-flex items-center justify-center"
               title="Fale conosco no WhatsApp"
             >
-              <svg className="w-5 h-5 fill-current" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                <path fillRule="evenodd" clipRule="evenodd" d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946C.06 5.348 5.397.01 12.008.01c3.202.001 6.212 1.246 8.477 3.514 2.266 2.268 3.507 5.28 3.505 8.484-.004 6.657-5.34 11.997-11.953 11.997-2.005-.001-3.973-.502-5.731-1.456L0 24zm6.59-4.846c1.6.95 3.188 1.449 4.825 1.451 5.436 0 9.86-4.37 9.864-9.799.002-2.623-1.023-5.086-2.884-6.948C16.59 1.993 14.137.973 11.52.973c-5.437 0-9.862 4.371-9.866 9.8.001 2.012.528 3.976 1.529 5.701L2.17 20.25l4.477-1.096zM18.06 14.93c-.33-.165-1.937-.957-2.235-1.066-.298-.108-.515-.162-.73.163-.215.325-.83.163-1.018-.163-.188-.329-.374-.637-.56-.967-.188-.33-.037-.506.126-.671.148-.15.33-.325.495-.49.165-.163.22-.271.33-.453.11-.183.055-.343-.028-.507-.082-.165-.73-1.761-1-2.414-.263-.637-.531-.55-.73-.56h-.627c-.215 0-.565.081-.861.408-.296.325-1.13 1.101-1.13 2.685 0 1.586 1.147 3.117 1.308 3.333.16.217 2.258 3.447 5.47 4.832.763.329 1.358.525 1.821.672.766.244 1.464.21 2.017.127.616-.092 1.937-.792 2.21-1.558.271-.767.271-1.425.19-1.557-.08-.135-.297-.217-.627-.38z" />
+              <svg viewBox="0 0 448 512" class="w-5 h-5 fill-current text-gray-700 hover:text-[#25D366] transition-colors" xmlns="http://www.w3.org/2000/svg">
+                <path d="M380.9 97.1C339 55.1 283.2 32 223.9 32c-122.4 0-222 99.6-222 222 0 39.1 10.2 77.3 29.6 111L0 480l117.7-30.9c32.4 17.8 68.9 27 106.1 27h.1c122.3 0 224.1-99.6 224.1-222 0-59.3-25.2-115-67.1-157zm-157 341.6c-33.2 0-65.7-8.9-94-25.7l-6.7-4-69.8 18.3L72 359.2l-4.4-7c-18.5-29.4-28.2-63.3-28.2-98.2 0-101.7 82.8-184.5 184.6-184.5 49.3 0 95.6 19.2 130.4 54.1 34.8 34.9 56.2 81.2 56.1 130.5 0 101.8-84.9 184.6-186.6 184.6zm101.2-138.2c-5.5-2.8-32.6-16.2-37.9-18-5.1-1.9-8.8-2.8-12.5 2.8-3.7 5.6-14.3 18-17.6 21.8-3.2 3.7-6.5 4.2-12 1.4-32.6-16.3-54-29.1-75.5-66-5.7-9.8 5.7-9.1 16.3-30.3 1.8-3.7.9-6.9-.5-9.7-1.4-2.8-12.5-30.1-17.1-41.2-4.5-10.8-9.1-9.3-12.5-9.5-3.2-.2-6.9-.2-10.6-.2-3.7 0-9.7 1.4-14.8 6.9-5.1 5.6-19.4 19-19.4 46.3 0 27.3 19.9 53.7 22.6 57.4 2.8 3.7 39.1 59.7 94.8 83.8 35.2 15.2 49 16.5 66.6 13.9 10.7-1.6 32.8-13.4 37.4-26.4 4.6-13 4.6-24.1 3.2-26.4-1.3-2.5-5-3.9-10.5-6.6z"/>
               </svg>
             </a>
           </div>
