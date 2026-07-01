@@ -8,9 +8,10 @@ export default function ProductFormModal({ isOpen, onClose, productToEdit, onSav
     original_price: '',
     promo_price: '',
     stock: '',
-    image_url: '',
     description: '',
   });
+  const [imageFile, setImageFile] = useState(null);
+  const [imagePreview, setImagePreview] = useState('');
 
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState({});
@@ -24,9 +25,10 @@ export default function ProductFormModal({ isOpen, onClose, productToEdit, onSav
         original_price: productToEdit.original_price || '',
         promo_price: productToEdit.promo_price || '',
         stock: productToEdit.stock || '0',
-        image_url: productToEdit.image_url || '',
         description: productToEdit.description || '',
       });
+      setImagePreview(productToEdit.image_url || '');
+      setImageFile(null);
     } else {
       setFormData({
         name: '',
@@ -34,9 +36,10 @@ export default function ProductFormModal({ isOpen, onClose, productToEdit, onSav
         original_price: '',
         promo_price: '',
         stock: '0',
-        image_url: '',
         description: '',
       });
+      setImagePreview('');
+      setImageFile(null);
     }
     setErrors({});
   }, [productToEdit, isOpen]);
@@ -67,8 +70,8 @@ export default function ProductFormModal({ isOpen, onClose, productToEdit, onSav
       tempErrors.stock = 'O estoque deve ser um número inteiro positivo.';
     }
 
-    if (!formData.image_url.trim()) {
-      tempErrors.image_url = 'A URL da imagem é obrigatória.';
+    if (!productToEdit && !imageFile) {
+      tempErrors.image_file = 'O arquivo de imagem é obrigatório.';
     }
 
     setErrors(tempErrors);
@@ -84,31 +87,52 @@ export default function ProductFormModal({ isOpen, onClose, productToEdit, onSav
     }
   };
 
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setImageFile(file);
+      setImagePreview(URL.createObjectURL(file));
+      if (errors.image_file) {
+        setErrors((prev) => ({ ...prev, image_file: '' }));
+      }
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!validate()) return;
 
     setLoading(true);
     try {
-      const payload = {
-        name: formData.name,
-        category: formData.category,
-        original_price: parseFloat(formData.original_price),
-        promo_price: (formData.promo_price !== undefined && formData.promo_price !== null && formData.promo_price !== '') 
-          ? parseFloat(formData.promo_price) 
-          : null,
-        stock: parseInt(formData.stock),
-        image_url: formData.image_url,
-        description: formData.description,
-      };
+      const payload = new FormData();
+      payload.append('name', formData.name);
+      payload.append('category', formData.category);
+      payload.append('original_price', formData.original_price);
+      if (formData.promo_price !== undefined && formData.promo_price !== null && formData.promo_price !== '') {
+        payload.append('promo_price', formData.promo_price);
+      }
+      payload.append('stock', formData.stock);
+      payload.append('description', formData.description);
+      
+      if (imageFile) {
+        payload.append('image', imageFile);
+      }
 
       if (productToEdit) {
         // Edit mode
-        await API.put(`/products/${productToEdit.id}`, payload);
+        await API.put(`/products/${productToEdit.id}`, payload, {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+        });
         addNotification('Produto atualizado com sucesso!', 'success');
       } else {
         // Create mode
-        await API.post('/products', payload);
+        await API.post('/products', payload, {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+        });
         addNotification('Produto cadastrado com sucesso!', 'success');
       }
 
@@ -119,9 +143,10 @@ export default function ProductFormModal({ isOpen, onClose, productToEdit, onSav
         original_price: '',
         promo_price: '',
         stock: '0',
-        image_url: '',
         description: '',
       });
+      setImageFile(null);
+      setImagePreview('');
 
       onSaveSuccess();
       onClose();
@@ -249,32 +274,30 @@ export default function ProductFormModal({ isOpen, onClose, productToEdit, onSav
             </div>
           </div>
 
-          {/* Row 3: Image URL */}
+          {/* Row 3: Image Upload */}
           <div>
             <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">
-              URL da Imagem *
+              Imagem do Produto *
             </label>
             <input
-              type="text"
-              name="image_url"
-              required
-              value={formData.image_url}
-              onChange={handleChange}
-              placeholder="https://exemplo.com/imagem.png"
+              type="file"
+              accept="image/*"
+              required={!productToEdit}
+              onChange={handleFileChange}
               className={`w-full bg-slate-50 border ${
-                errors.image_url ? 'border-rose-500/50 focus:ring-rose-500/20' : 'border-slate-200 focus:border-[#202020] focus:bg-white'
-              } rounded-xl px-3.5 py-2 text-sm text-slate-800 focus:outline-none focus:ring-1 focus:ring-[#202020]/20 transition-all`}
+                errors.image_file ? 'border-rose-500/50 focus:ring-rose-500/20' : 'border-slate-200 focus:border-[#202020] focus:bg-white'
+              } rounded-xl px-3.5 py-2 text-sm text-slate-800 focus:outline-none focus:ring-1 focus:ring-[#202020]/20 transition-all cursor-pointer`}
             />
-            {errors.image_url && <span className="text-xs text-rose-500 mt-1 block">{errors.image_url}</span>}
-            {formData.image_url && (
+            {errors.image_file && <span className="text-xs text-rose-500 mt-1 block">{errors.image_file}</span>}
+            {imagePreview && (
               <div className="mt-3 flex items-center gap-3 p-2 bg-slate-50 rounded-xl border border-slate-100">
                 <img
-                  src={formData.image_url}
+                  src={imagePreview}
                   alt="Preview"
                   className="w-14 h-14 object-cover rounded-lg border border-slate-100 bg-white"
                   onError={(e) => { e.target.style.display = 'none'; }}
                 />
-                <span className="text-xs text-slate-500">Visualização prévia da imagem configurada.</span>
+                <span className="text-xs text-slate-500">Visualização prévia da imagem carregada.</span>
               </div>
             )}
           </div>
