@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import API from '../api/api';
 
 export default function Admin({ 
@@ -13,6 +13,14 @@ export default function Admin({
 }) {
   const [productToDelete, setProductToDelete] = useState(null);
   const [deleteLoading, setDeleteLoading] = useState(false);
+
+  // Tabs and Orders states
+  const [activeTab, setActiveTab] = useState('produtos');
+  const [orders, setOrders] = useState([]);
+  const [ordersLoading, setOrdersLoading] = useState(false);
+  const [selectedOrderForItems, setSelectedOrderForItems] = useState(null);
+  const [orderItems, setOrderItems] = useState([]);
+  const [orderItemsLoading, setOrderItemsLoading] = useState(false);
 
   // 2FA modal states
   const [is2FAOpen, setIs2FAOpen] = useState(false);
@@ -37,6 +45,53 @@ export default function Admin({
       currency: 'BRL',
     }).format(price);
   };
+
+  const fetchOrders = async () => {
+    setOrdersLoading(true);
+    try {
+      const response = await API.get('/orders');
+      setOrders(response.data);
+    } catch (error) {
+      console.error('Erro ao buscar pedidos:', error);
+      addNotification('Erro ao carregar pedidos do servidor.', 'error');
+    } finally {
+      setOrdersLoading(false);
+    }
+  };
+
+  const handleUpdateOrderStatus = async (orderId, newStatus) => {
+    try {
+      await API.put(`/orders/${orderId}/status`, { status: newStatus });
+      addNotification(`Pedido atualizado para ${newStatus}!`, 'success');
+      fetchOrders();
+      if (newStatus === 'Concluído' && fetchProducts) {
+        fetchProducts(); // Refresh products list to show decreased stocks!
+      }
+    } catch (error) {
+      console.error('Erro ao atualizar status do pedido:', error);
+      addNotification('Erro ao atualizar status do pedido.', 'error');
+    }
+  };
+
+  const handleViewOrderDetails = async (order) => {
+    setSelectedOrderForItems(order);
+    setOrderItemsLoading(true);
+    try {
+      const response = await API.get(`/orders/${order.id}/items`);
+      setOrderItems(response.data);
+    } catch (error) {
+      console.error('Erro ao buscar itens:', error);
+      addNotification('Erro ao carregar itens do pedido.', 'error');
+    } finally {
+      setOrderItemsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (activeTab === 'pedidos') {
+      fetchOrders();
+    }
+  }, [activeTab]);
 
   // Handle Delete execution
   const handleDelete = async () => {
@@ -170,29 +225,141 @@ export default function Admin({
         </div>
       </div>
 
-      {/* Products Table */}
-      {loading ? (
-        <div className="flex flex-col items-center justify-center py-20">
-          <div className="w-12 h-12 border-4 border-slate-200 border-t-[#202020] rounded-full animate-spin"></div>
-          <p className="mt-4 text-slate-400 text-sm">Carregando dados da tabela...</p>
-        </div>
-      ) : products.length === 0 ? (
-        <div className="text-center py-16 bg-white border border-slate-100 rounded-2xl shadow-sm">
-          <svg className="w-16 h-16 text-slate-300 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
-          </svg>
-          <h3 className="text-lg font-semibold text-slate-700 mb-1">Nenhum produto cadastrado</h3>
-          <p className="text-slate-400 text-sm mb-4">Inicie o seu catálogo adicionando novos produtos.</p>
-          <button
-            onClick={onOpenAddModal}
-            className="px-4 py-2 text-xs font-semibold uppercase tracking-wider rounded-lg bg-[#202020] hover:bg-black text-white transition-all shadow-sm"
-          >
-            Adicionar Primeiro Produto
-          </button>
-        </div>
+      {/* Tabs Switcher */}
+      <div className="flex border-b border-slate-200 mb-6 gap-6">
+        <button
+          onClick={() => setActiveTab('produtos')}
+          className={`pb-3 font-bold text-sm transition-all focus:outline-none cursor-pointer border-b-2 ${
+            activeTab === 'produtos'
+              ? 'border-[#202020] text-slate-900'
+              : 'border-transparent text-slate-400 hover:text-slate-600'
+          }`}
+        >
+          Produtos
+        </button>
+        <button
+          onClick={() => setActiveTab('pedidos')}
+          className={`pb-3 font-bold text-sm transition-all focus:outline-none cursor-pointer border-b-2 ${
+            activeTab === 'pedidos'
+              ? 'border-[#202020] text-slate-900'
+              : 'border-transparent text-slate-400 hover:text-slate-600'
+          }`}
+        >
+          Pedidos
+        </button>
+      </div>
+
+      {/* Main Content Area: Products Table or Orders Table */}
+      {activeTab === 'pedidos' ? (
+        ordersLoading ? (
+          <div className="flex flex-col items-center justify-center py-20">
+            <div className="w-12 h-12 border-4 border-slate-200 border-t-[#202020] rounded-full animate-spin"></div>
+            <p className="mt-4 text-slate-400 text-sm">Carregando pedidos...</p>
+          </div>
+        ) : orders.length === 0 ? (
+          <div className="text-center py-16 bg-white border border-slate-100 rounded-2xl shadow-sm">
+            <svg className="w-16 h-16 text-slate-300 mx-auto mb-4" fill="none" stroke="currentColor" strokeWidth="1.8" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path>
+            </svg>
+            <h3 className="text-lg font-semibold text-slate-700 mb-1">Nenhum pedido registrado</h3>
+            <p className="text-slate-400 text-sm">Os pedidos dos clientes aparecerão aqui assim que finalizados no site.</p>
+          </div>
+        ) : (
+          <div className="bg-white rounded-2xl overflow-hidden shadow-sm border border-slate-100 animate-fade-in">
+            <div className="overflow-x-auto">
+              <table className="w-full text-left border-collapse">
+                <thead>
+                  <tr className="border-b border-slate-100 text-slate-400 font-semibold text-xs uppercase tracking-wider bg-slate-50">
+                    <th className="px-6 py-4.5">Número do Pedido</th>
+                    <th className="px-6 py-4.5">Data</th>
+                    <th className="px-6 py-4.5">Valor Total</th>
+                    <th className="px-6 py-4.5">Status</th>
+                    <th className="px-6 py-4.5 text-right">Ações</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-100">
+                  {orders.map((order) => (
+                    <tr key={order.id} className="hover:bg-slate-50/50 transition-colors">
+                      <td className="px-6 py-4 text-sm font-bold text-slate-800">
+                        #{order.order_number}
+                      </td>
+                      <td className="px-6 py-4 text-xs text-slate-500">
+                        {formatDate(order.created_at)}
+                      </td>
+                      <td className="px-6 py-4 text-sm font-semibold text-slate-800">
+                        {formatPrice(order.total_price)}
+                      </td>
+                      <td className="px-6 py-4">
+                        {order.status === 'Concluído' ? (
+                          <span className="inline-flex items-center text-xs font-semibold px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-100">
+                            Concluído
+                          </span>
+                        ) : order.status === 'Cancelado' ? (
+                          <span className="inline-flex items-center text-xs font-semibold px-2.5 py-0.5 rounded-full bg-rose-50 text-rose-700 border border-rose-100">
+                            Cancelado
+                          </span>
+                        ) : (
+                          <span className="inline-flex items-center text-xs font-semibold px-2.5 py-0.5 rounded-full bg-amber-50 text-amber-700 border border-amber-100 animate-pulse">
+                            Pendente
+                          </span>
+                        )}
+                      </td>
+                      <td className="px-6 py-4 text-right">
+                        <div className="flex items-center justify-end gap-2">
+                          <button
+                            onClick={() => handleViewOrderDetails(order)}
+                            className="p-2 rounded-lg text-slate-400 hover:text-slate-850 hover:bg-slate-55 border border-transparent hover:border-slate-200 transition-all cursor-pointer"
+                            title="Visualizar Detalhes"
+                          >
+                            <svg className="w-4.5 h-4.5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                              <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                              <path strokeLinecap="round" strokeLinejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                            </svg>
+                          </button>
+                          {order.status === 'Pendente' && (
+                            <button
+                              onClick={() => handleUpdateOrderStatus(order.id, 'Concluído')}
+                              className="p-2 rounded-lg text-slate-400 hover:text-emerald-600 hover:bg-emerald-50 border border-transparent hover:border-emerald-100 transition-all cursor-pointer"
+                              title="Aprovar Pedido e dar baixa no Estoque"
+                            >
+                              <svg className="w-4.5 h-4.5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7"></path>
+                              </svg>
+                            </button>
+                          )}
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )
       ) : (
-        <div className="bg-white rounded-2xl overflow-hidden shadow-sm border border-slate-100">
-          <div className="overflow-x-auto">
+        /* Products Table */
+        loading ? (
+          <div className="flex flex-col items-center justify-center py-20">
+            <div className="w-12 h-12 border-4 border-slate-200 border-t-[#202020] rounded-full animate-spin"></div>
+            <p className="mt-4 text-slate-400 text-sm">Carregando dados da tabela...</p>
+          </div>
+        ) : products.length === 0 ? (
+          <div className="text-center py-16 bg-white border border-slate-100 rounded-2xl shadow-sm">
+            <svg className="w-16 h-16 text-slate-300 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
+            </svg>
+            <h3 className="text-lg font-semibold text-slate-700 mb-1">Nenhum produto cadastrado</h3>
+            <p className="text-slate-400 text-sm mb-4">Inicie o seu catálogo adicionando novos produtos.</p>
+            <button
+              onClick={onOpenAddModal}
+              className="px-4 py-2 text-xs font-semibold uppercase tracking-wider rounded-lg bg-[#202020] hover:bg-black text-white transition-all shadow-sm"
+            >
+              Adicionar Primeiro Produto
+            </button>
+          </div>
+        ) : (
+          <div className="bg-white rounded-2xl overflow-hidden shadow-sm border border-slate-100">
+            <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse">
               <thead>
                 <tr className="border-b border-slate-100 text-slate-400 font-semibold text-xs uppercase tracking-wider bg-slate-50">
@@ -301,7 +468,7 @@ export default function Admin({
             </table>
           </div>
         </div>
-      )}
+      ))}`
 
       {/* Delete Confirmation Modal */}
       {productToDelete && (
@@ -490,6 +657,88 @@ export default function Admin({
                 </div>
               </form>
             )}
+          </div>
+        </div>
+      )}
+
+      {/* Order Details Modal */}
+      {selectedOrderForItems && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm">
+          <div className="w-full max-w-2xl bg-white border border-slate-200 rounded-2xl shadow-2xl overflow-hidden animate-scale-up">
+            {/* Header */}
+            <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100">
+              <h2 className="text-lg font-bold text-slate-900">
+                Itens do Pedido #{selectedOrderForItems.order_number}
+              </h2>
+              <button
+                onClick={() => setSelectedOrderForItems(null)}
+                className="text-slate-400 hover:text-slate-650 p-1.5 rounded-lg hover:bg-slate-50 transition-all cursor-pointer"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"></path>
+                </svg>
+              </button>
+            </div>
+
+            {/* Body */}
+            <div className="p-6 max-h-[60vh] overflow-y-auto space-y-4">
+              {orderItemsLoading ? (
+                <div className="flex flex-col items-center justify-center py-10">
+                  <div className="w-8 h-8 border-3 border-slate-200 border-t-[#202020] rounded-full animate-spin"></div>
+                  <p className="mt-3 text-xs text-slate-400">Carregando itens...</p>
+                </div>
+              ) : (
+                <div className="divide-y divide-slate-100">
+                  {orderItems.map((item) => (
+                    <div key={item.id} className="flex items-center gap-4 py-3 first:pt-0 last:pb-0">
+                      {/* Thumbnail */}
+                      <img
+                        src={item.image_url}
+                        alt={item.name}
+                        className="w-12 h-12 object-cover rounded-lg border border-slate-100 bg-slate-50 shrink-0"
+                        onError={(e) => {
+                          e.target.src = 'https://images.unsplash.com/photo-1531403009284-440f080d1e12?w=800&auto=format&fit=crop&q=80';
+                        }}
+                      />
+                      
+                      {/* Product Name & details */}
+                      <div className="flex-grow min-w-0">
+                        <div className="text-sm font-bold text-slate-800 truncate">
+                          {item.name}
+                        </div>
+                        <div className="text-xs text-slate-500">
+                          Preço unitário: {formatPrice(item.price)}
+                        </div>
+                      </div>
+
+                      {/* Quantity & Subtotal */}
+                      <div className="text-right shrink-0">
+                        <div className="text-sm font-semibold text-slate-800">
+                          {item.quantity}x
+                        </div>
+                        <div className="text-xs text-slate-500 font-medium">
+                          {formatPrice(parseFloat(item.price) * item.quantity)}
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* Footer */}
+            <div className="bg-slate-50 px-6 py-4 border-t border-slate-100 flex items-center justify-between">
+              <div>
+                <span className="text-xs text-slate-400 uppercase tracking-wider block font-bold font-semibold">Total do Pedido</span>
+                <span className="text-lg font-black text-slate-900">{formatPrice(selectedOrderForItems.total_price)}</span>
+              </div>
+              <button
+                onClick={() => setSelectedOrderForItems(null)}
+                className="px-5 py-2 rounded-xl bg-[#202020] hover:bg-black text-white text-xs font-bold transition-all cursor-pointer shadow-sm border-none"
+              >
+                Fechar
+              </button>
+            </div>
           </div>
         </div>
       )}
