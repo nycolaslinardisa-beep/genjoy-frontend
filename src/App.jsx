@@ -25,6 +25,81 @@ export default function App() {
   const [notifications, setNotifications] = useState([]);
   const [categories, setCategories] = useState([]);
 
+  // Carrinho de Compras State
+  const [cart, setCart] = useState(() => {
+    const storedCart = localStorage.getItem('genjoy_cart');
+    if (storedCart) {
+      try {
+        return JSON.parse(storedCart);
+      } catch (e) {
+        return [];
+      }
+    }
+    return [];
+  });
+
+  // Sync cart to localStorage
+  useEffect(() => {
+    localStorage.setItem('genjoy_cart', JSON.stringify(cart));
+  }, [cart]);
+
+  // Cart operations
+  const addToCart = (product) => {
+    setCart((prevCart) => {
+      const existingItem = prevCart.find((item) => item.id === product.id);
+      if (existingItem) {
+        addNotification(`Mais um ${product.name} adicionado ao carrinho!`, 'success');
+        return prevCart.map((item) =>
+          item.id === product.id ? { ...item, quantity: item.quantity + 1 } : item
+        );
+      }
+      addNotification(`${product.name} adicionado ao carrinho!`, 'success');
+      
+      const hasPromo = product.id % 2 === 0;
+      const discountPercent = ((product.id * 3) % 15) + 5;
+      const originalPrice = product.price / (1 - discountPercent / 100);
+      
+      return [
+        ...prevCart,
+        {
+          id: product.id,
+          name: product.name,
+          price: product.price,
+          originalPrice: hasPromo ? originalPrice : product.price,
+          hasPromo,
+          quantity: 1,
+          image: product.image_url,
+        },
+      ];
+    });
+  };
+
+  const removeFromCart = (productId) => {
+    setCart((prevCart) => {
+      const item = prevCart.find((i) => i.id === productId);
+      if (item) {
+        addNotification(`${item.name} removido do carrinho!`, 'error');
+      }
+      return prevCart.filter((i) => i.id !== productId);
+    });
+  };
+
+  const updateQuantity = (productId, newQty) => {
+    if (newQty <= 0) {
+      removeFromCart(productId);
+      return;
+    }
+    setCart((prevCart) =>
+      prevCart.map((item) =>
+        item.id === productId ? { ...item, quantity: newQty } : item
+      )
+    );
+  };
+
+  const clearCart = () => {
+    setCart([]);
+  };
+
   // Load token/user from local storage on startup
   useEffect(() => {
     const storedUser = localStorage.getItem('genjoy_user');
@@ -115,6 +190,10 @@ export default function App() {
         categories={categories}
         currentUser={currentUser}
         onLogout={handleLogout}
+        cart={cart}
+        updateQuantity={updateQuantity}
+        removeFromCart={removeFromCart}
+        clearCart={clearCart}
       />
 
       {/* Pages Container */}
@@ -128,6 +207,7 @@ export default function App() {
             selectedCategory={selectedCategory}
             setSelectedCategory={setSelectedCategory}
             categories={categories}
+            addToCart={addToCart}
           />
         ) : !currentUser ? (
           <Login onAuthSuccess={setCurrentUser} addNotification={addNotification} />

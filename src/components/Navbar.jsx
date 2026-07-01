@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import logo from '../assets/logo.jpeg';
 
 export default function Navbar({
@@ -10,8 +10,30 @@ export default function Navbar({
   setSelectedCategory,
   categories,
   currentUser,
-  onLogout
+  onLogout,
+  cart = [],
+  updateQuantity,
+  removeFromCart,
+  clearCart
 }) {
+  const [isCartOpen, setIsCartOpen] = useState(false);
+
+  const formatPrice = (value) => {
+    return new Intl.NumberFormat('pt-BR', {
+      style: 'currency',
+      currency: 'BRL',
+    }).format(value);
+  };
+
+  const cartItemsCount = cart.reduce((acc, item) => acc + item.quantity, 0);
+  const cartSubtotal = cart.reduce((acc, item) => acc + item.price * item.quantity, 0);
+  const cartDiscount = cart.reduce((acc, item) => {
+    if (item.hasPromo) {
+      const diff = item.originalPrice - item.price;
+      return acc + (diff * item.quantity);
+    }
+    return acc;
+  }, 0);
   const handleCategoryClick = (category) => {
     setSelectedCategory(category);
     setCurrentTab('catalog');
@@ -125,18 +147,21 @@ export default function Navbar({
               </div>
             )}
 
-            {/* Shopping Cart Icon */}
-            <a
-              href="https://wa.me/556499731390"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="p-2 text-slate-600 hover:text-black cursor-pointer transition-colors group flex items-center justify-center"
-              title="Sua Sacola / Carrinho no WhatsApp"
+            {/* Shopping Cart Button */}
+            <button
+              onClick={() => setIsCartOpen(true)}
+              className="relative p-2 text-slate-600 hover:text-black cursor-pointer transition-colors group flex items-center justify-center border-none bg-transparent outline-none focus:outline-none"
+              title="Ver Sacola / Carrinho"
             >
               <svg className="w-5 h-5 stroke-current group-hover:scale-105 transition-transform" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path>
               </svg>
-            </a>
+              {cartItemsCount > 0 && (
+                <span className="absolute -top-1 -right-2 bg-black text-white text-[10px] w-4 h-4 rounded-full flex items-center justify-center font-bold">
+                  {cartItemsCount}
+                </span>
+              )}
+            </button>
 
             {/* Instagram Link Button */}
             <a
@@ -216,6 +241,174 @@ export default function Navbar({
           })}
         </div>
       </div>
+
+      {/* Drawer / Modal Lateral do Carrinho */}
+      {isCartOpen && (
+        <div className="fixed inset-0 z-50 overflow-hidden" aria-labelledby="slide-over-title" role="dialog" aria-modal="true">
+          {/* Background Backdrop Overlay */}
+          <div 
+            onClick={() => setIsCartOpen(false)}
+            className="absolute inset-0 bg-slate-500 bg-opacity-75 transition-opacity duration-500 ease-in-out"
+          ></div>
+
+          <div className="fixed inset-y-0 right-0 pl-10 max-w-full flex">
+            {/* Slide-over panel */}
+            <div className="w-screen max-w-md bg-white shadow-2xl flex flex-col h-full transform transition duration-500 ease-in-out animate-slide-left">
+              {/* Header */}
+              <div className="p-6 border-b border-slate-100 flex items-center justify-between">
+                <h2 className="text-lg font-bold text-slate-900 uppercase tracking-tight flex items-center gap-2">
+                  <svg className="w-5 h-5 stroke-current text-slate-900" fill="none" stroke="currentColor" strokeWidth="2.2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path>
+                  </svg>
+                  Minha Sacola
+                </h2>
+                <button
+                  onClick={() => setIsCartOpen(false)}
+                  className="p-1 rounded-full text-slate-400 hover:text-slate-600 hover:bg-slate-50 transition-all cursor-pointer focus:outline-none"
+                >
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12"></path>
+                  </svg>
+                </button>
+              </div>
+
+              {/* Content / Items List */}
+              <div className="flex-1 overflow-y-auto p-6 space-y-4">
+                {cart.length === 0 ? (
+                  <div className="text-center py-20 flex flex-col items-center justify-center h-full">
+                    <svg className="w-16 h-16 text-slate-200 mb-4" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path>
+                    </svg>
+                    <h3 className="text-base font-bold text-slate-800 mb-1">Seu carrinho está vazio</h3>
+                    <p className="text-slate-450 text-xs">Adicione celulares ou acessórios do catálogo para começar.</p>
+                  </div>
+                ) : (
+                  <div className="space-y-4 divide-y divide-slate-100">
+                    {cart.map((item, idx) => {
+                      const itemSubtotal = item.price * item.quantity;
+                      return (
+                        <div key={item.id} className={`flex items-center gap-4 py-4 ${idx === 0 ? 'pt-0' : ''}`}>
+                          {/* Thumbnail */}
+                          <div className="w-16 h-16 bg-slate-50 rounded-xl border border-slate-100 overflow-hidden flex items-center justify-center p-1 shrink-0">
+                            <img 
+                              src={item.image} 
+                              alt={item.name} 
+                              className="w-full h-full object-contain" 
+                              onError={(e) => {
+                                e.target.src = 'https://images.unsplash.com/photo-1531403009284-440f080d1e12?w=800&auto=format&fit=crop&q=80';
+                              }}
+                            />
+                          </div>
+
+                          {/* Title and price */}
+                          <div className="flex-grow min-w-0">
+                            <h4 className="font-bold text-sm text-slate-900 truncate" title={item.name}>{item.name}</h4>
+                            <span className="text-xs text-slate-500 font-semibold mt-0.5 block">
+                              {formatPrice(item.price)}
+                            </span>
+
+                            {/* Quantity controls */}
+                            <div className="flex items-center gap-2 mt-2">
+                              <button
+                                onClick={() => updateQuantity(item.id, item.quantity - 1)}
+                                className="w-6 h-6 rounded-md border border-slate-200 hover:border-slate-400 flex items-center justify-center text-xs font-semibold text-slate-600 transition-colors focus:outline-none cursor-pointer"
+                              >
+                                -
+                              </button>
+                              <span className="text-xs font-bold text-slate-800 w-6 text-center select-none">{item.quantity}</span>
+                              <button
+                                onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                                className="w-6 h-6 rounded-md border border-slate-200 hover:border-slate-400 flex items-center justify-center text-xs font-semibold text-slate-600 transition-colors focus:outline-none cursor-pointer"
+                              >
+                                +
+                              </button>
+                            </div>
+                          </div>
+
+                          {/* Actions & subtotal */}
+                          <div className="flex flex-col items-end justify-between self-stretch shrink-0">
+                            <button 
+                              onClick={() => removeFromCart(item.id)}
+                              className="text-slate-400 hover:text-rose-600 p-1 cursor-pointer transition-colors focus:outline-none"
+                              title="Remover item"
+                            >
+                              <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                              </svg>
+                            </button>
+                            <span className="text-xs font-bold text-slate-900 leading-tight mt-auto">
+                              {formatPrice(itemSubtotal)}
+                            </span>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+
+              {/* Footer / Calculations */}
+              {cart.length > 0 && (
+                <div className="p-6 border-t border-slate-100 bg-slate-50 space-y-4 shrink-0">
+                  {/* Calculations */}
+                  <div className="space-y-1.5 text-xs text-slate-500 font-medium">
+                    <div className="flex justify-between">
+                      <span>Subtotal</span>
+                      <span className="text-slate-800 font-semibold">
+                        {formatPrice(cartSubtotal + cartDiscount)}
+                      </span>
+                    </div>
+                    
+                    {/* Simulate promotions / discount if has any items with promo */}
+                    {cartDiscount > 0 && (
+                      <div className="flex justify-between text-emerald-600">
+                        <span>Desconto Promoções (Simulado)</span>
+                        <span>
+                          -{formatPrice(cartDiscount)}
+                        </span>
+                      </div>
+                    )}
+
+                    <hr className="border-slate-200 my-2" />
+                    
+                    <div className="flex justify-between text-sm font-bold text-slate-900">
+                      <span>Total</span>
+                      <span>
+                        {formatPrice(cartSubtotal)}
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* WhatsApp Button */}
+                  <button
+                    onClick={() => {
+                      let message = `Olá, Genjoy! Gostaria de fechar o seguinte pedido:\n`;
+                      cart.forEach((item) => {
+                        message += `- ${item.quantity}x ${item.name} (${formatPrice(item.price)} cada)\n`;
+                      });
+                      message += `------------------------------------\n`;
+                      message += `Total: ${formatPrice(cartSubtotal)}`;
+                      
+                      const encodedMessage = encodeURIComponent(message);
+                      const whatsappUrl = `https://wa.me/556499731390?text=${encodedMessage}`;
+                      
+                      window.open(whatsappUrl, '_blank', 'noopener,noreferrer');
+                      clearCart();
+                      setIsCartOpen(false);
+                    }}
+                    className="w-full py-3 bg-[#25D366] hover:bg-[#20ba5a] text-white font-bold text-sm rounded-xl flex items-center justify-center gap-2 transition-all shadow-md cursor-pointer border-none"
+                  >
+                    <svg viewBox="0 0 448 512" class="w-5 h-5 fill-current text-white" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M380.9 97.1C339 55.1 283.2 32 223.9 32c-122.4 0-222 99.6-222 222 0 39.1 10.2 77.3 29.6 111L0 480l117.7-30.9c32.4 17.7 68.9 27 106.1 27h.1c122.3 0 224.1-99.6 224.1-222 0-59.3-25.2-115-67.1-157zm-157 341.6c-33.2 0-65.7-8.9-94-25.7l-6.7-4-69.8 18.3L72 359.2l-4.4-7c-18.5-29.4-28.2-63.3-28.2-98.2 0-101.7 82.8-184.5 184.6-184.5 49.3 0 95.6 19.2 130.4 54.1 34.8 34.9 56.2 81.2 56.1 130.5 0 101.8-84.9 184.6-186.6 184.6zm101.2-138.2c-5.5-2.8-32.8-16.2-37.9-18-5.1-1.9-8.8-2.8-12.5 2.8-3.7 5.6-14.3 18-17.6 21.8-3.2 3.7-6.5 4.2-12 1.4-32.6-16.3-54-29.1-75.5-66-5.7-9.8 5.7-9.1 16.3-30.3 1.8-3.7.9-6.9-.5-9.7-1.4-2.8-12.5-30.1-17.1-41.2-4.5-10.8-9.1-9.3-12.5-9.5-3.2-.2-6.9-.2-10.6-.2-3.7 0-9.7 1.4-14.8 6.9-5.1 5.6-19.4 19-19.4 46.3 0 27.3 19.9 53.7 22.6 57.4 2.8 3.7 39.1 59.7 94.8 83.8 35.2 15.2 49 16.5 66.6 13.9 10.7-1.6 32.8-13.4 37.4-26.4 4.6-13 4.6-24.1 3.2-26.4-1.3-2.5-5-3.9-10.5-6.6z"/>
+                    </svg>
+                    Concluir Pedido via WhatsApp
+                  </button>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </header>
   );
 }
