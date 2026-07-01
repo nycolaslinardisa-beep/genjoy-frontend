@@ -39,9 +39,9 @@ export default function Catalog({
       }
     }
 
-    // 3. Promo Filter (Even IDs simulated as promotions)
+    // 3. Promo Filter (Real database promo_price check)
     if (promoFilter === 'promo') {
-      const hasPromo = p.id % 2 === 0;
+      const hasPromo = p.promo_price !== null && p.promo_price !== undefined;
       if (!hasPromo) return false;
     }
 
@@ -50,11 +50,13 @@ export default function Catalog({
 
   // Sort products
   const sortedProducts = [...filteredProducts].sort((a, b) => {
+    const priceA = a.promo_price ? parseFloat(a.promo_price) : parseFloat(a.original_price);
+    const priceB = b.promo_price ? parseFloat(b.promo_price) : parseFloat(b.original_price);
     if (sortBy === 'price-asc') {
-      return parseFloat(a.price) - parseFloat(b.price);
+      return priceA - priceB;
     }
     if (sortBy === 'price-desc') {
-      return parseFloat(b.price) - parseFloat(a.price);
+      return priceB - priceA;
     }
     if (sortBy === 'name-asc') {
       return a.name.localeCompare(b.name);

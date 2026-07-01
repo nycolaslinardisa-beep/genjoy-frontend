@@ -14,13 +14,11 @@ export default function ProductCard({ product, addToCart }) {
   const isOutOfStock = product.stock <= 0;
   
   // Calculate promo values
-  const hasPromo = product.id % 2 === 0;
-  const discountPercent = ((product.id * 3) % 15) + 5; // e.g. 5% to 19%
-  const originalPrice = product.price / (1 - discountPercent / 100);
+  const hasPromo = product.promo_price !== null && product.promo_price !== undefined;
+  const originalPrice = parseFloat(product.original_price);
+  const promoPrice = hasPromo ? parseFloat(product.promo_price) : null;
+  const discountPercent = hasPromo ? Math.round(((originalPrice - promoPrice) / originalPrice) * 100) : 0;
 
-  // WhatsApp order message & link
-  const orderMessage = `Olá! Gostaria de pedir o produto: *${product.name}* (Preço: ${formatPrice(product.price)}).`;
-  const whatsappUrl = `https://wa.me/556499731390?text=${encodeURIComponent(orderMessage)}`;
 
   return (
     <div className="p-3 bg-white rounded-2xl border border-slate-100 shadow-sm hover:shadow-md transition-all duration-300 flex flex-col h-full group relative">
@@ -42,8 +40,8 @@ export default function ProductCard({ product, addToCart }) {
             Destaque
           </span>
           {hasPromo && (
-            <span className="text-[9px] font-bold px-2 py-0.5 rounded-sm bg-[#E11D48] text-white tracking-wider">
-              {discountPercent}% OFF
+            <span className="text-[9px] font-black px-2.5 py-0.5 rounded-sm bg-[#FFE600] text-red-600 font-extrabold uppercase tracking-wide">
+              OFERTA {discountPercent}% OFF
             </span>
           )}
         </div>
@@ -97,8 +95,8 @@ export default function ProductCard({ product, addToCart }) {
           <div className="flex items-baseline gap-2">
             {hasPromo ? (
               <>
-                <span className="text-base font-black text-black leading-tight">
-                  {formatPrice(product.price)}
+                <span className="text-lg font-black text-[#ff5a00] leading-tight">
+                  {formatPrice(promoPrice)}
                 </span>
                 <span className="text-xs text-slate-400 line-through">
                   {formatPrice(originalPrice)}
@@ -106,7 +104,7 @@ export default function ProductCard({ product, addToCart }) {
               </>
             ) : (
               <span className="text-base font-black text-black leading-tight">
-                {formatPrice(product.price)}
+                {formatPrice(originalPrice)}
               </span>
             )}
           </div>

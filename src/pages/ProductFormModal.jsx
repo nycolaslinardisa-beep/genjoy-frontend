@@ -5,7 +5,8 @@ export default function ProductFormModal({ isOpen, onClose, productToEdit, onSav
   const [formData, setFormData] = useState({
     name: '',
     category: '',
-    price: '',
+    original_price: '',
+    promo_price: '',
     stock: '',
     image_url: '',
     description: '',
@@ -20,7 +21,8 @@ export default function ProductFormModal({ isOpen, onClose, productToEdit, onSav
       setFormData({
         name: productToEdit.name || '',
         category: productToEdit.category || '',
-        price: productToEdit.price || '',
+        original_price: productToEdit.original_price || '',
+        promo_price: productToEdit.promo_price || '',
         stock: productToEdit.stock || '0',
         image_url: productToEdit.image_url || '',
         description: productToEdit.description || '',
@@ -29,7 +31,8 @@ export default function ProductFormModal({ isOpen, onClose, productToEdit, onSav
       setFormData({
         name: '',
         category: '',
-        price: '',
+        original_price: '',
+        promo_price: '',
         stock: '0',
         image_url: '',
         description: '',
@@ -46,16 +49,26 @@ export default function ProductFormModal({ isOpen, onClose, productToEdit, onSav
     if (!formData.name.trim()) tempErrors.name = 'O nome é obrigatório.';
     if (!formData.category.trim()) tempErrors.category = 'A categoria é obrigatória.';
     
-    if (!formData.price) {
-      tempErrors.price = 'O preço é obrigatório.';
-    } else if (isNaN(formData.price) || parseFloat(formData.price) < 0) {
-      tempErrors.price = 'O preço deve ser um número positivo.';
+    if (!formData.original_price) {
+      tempErrors.original_price = 'O preço anterior é obrigatório.';
+    } else if (isNaN(formData.original_price) || parseFloat(formData.original_price) < 0) {
+      tempErrors.original_price = 'O preço anterior deve ser um número positivo.';
+    }
+
+    if (formData.promo_price !== undefined && formData.promo_price !== null && formData.promo_price !== '') {
+      if (isNaN(formData.promo_price) || parseFloat(formData.promo_price) < 0) {
+        tempErrors.promo_price = 'O preço promocional deve ser um número positivo.';
+      }
     }
 
     if (formData.stock === '') {
       tempErrors.stock = 'O estoque é obrigatório.';
     } else if (isNaN(formData.stock) || parseInt(formData.stock) < 0) {
       tempErrors.stock = 'O estoque deve ser um número inteiro positivo.';
+    }
+
+    if (!formData.image_url.trim()) {
+      tempErrors.image_url = 'A URL da imagem é obrigatória.';
     }
 
     setErrors(tempErrors);
@@ -78,9 +91,15 @@ export default function ProductFormModal({ isOpen, onClose, productToEdit, onSav
     setLoading(true);
     try {
       const payload = {
-        ...formData,
-        price: parseFloat(formData.price),
+        name: formData.name,
+        category: formData.category,
+        original_price: parseFloat(formData.original_price),
+        promo_price: (formData.promo_price !== undefined && formData.promo_price !== null && formData.promo_price !== '') 
+          ? parseFloat(formData.promo_price) 
+          : null,
         stock: parseInt(formData.stock),
+        image_url: formData.image_url,
+        description: formData.description,
       };
 
       if (productToEdit) {
@@ -92,6 +111,17 @@ export default function ProductFormModal({ isOpen, onClose, productToEdit, onSav
         await API.post('/products', payload);
         addNotification('Produto cadastrado com sucesso!', 'success');
       }
+
+      // Reset form states completely to blank/initial values after successful submission
+      setFormData({
+        name: '',
+        category: '',
+        original_price: '',
+        promo_price: '',
+        stock: '0',
+        image_url: '',
+        description: '',
+      });
 
       onSaveSuccess();
       onClose();
@@ -163,24 +193,42 @@ export default function ProductFormModal({ isOpen, onClose, productToEdit, onSav
             </div>
           </div>
 
-          {/* Row 2: Price and Stock */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {/* Row 2: Prices and Stock */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
               <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">
-                Preço (R$) *
+                Preço Anterior (R$) *
               </label>
               <input
                 type="number"
                 step="0.01"
-                name="price"
-                value={formData.price}
+                name="original_price"
+                value={formData.original_price}
                 onChange={handleChange}
                 placeholder="0.00"
                 className={`w-full bg-slate-50 border ${
-                  errors.price ? 'border-rose-500/50 focus:ring-rose-500/20' : 'border-slate-200 focus:border-[#202020] focus:bg-white'
+                  errors.original_price ? 'border-rose-500/50 focus:ring-rose-500/20' : 'border-slate-200 focus:border-[#202020] focus:bg-white'
                 } rounded-xl px-3.5 py-2 text-sm text-slate-800 focus:outline-none focus:ring-1 focus:ring-[#202020]/20 transition-all`}
               />
-              {errors.price && <span className="text-xs text-rose-500 mt-1 block">{errors.price}</span>}
+              {errors.original_price && <span className="text-xs text-rose-500 mt-1 block">{errors.original_price}</span>}
+            </div>
+
+            <div>
+              <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">
+                Preço Promocional (R$)
+              </label>
+              <input
+                type="number"
+                step="0.01"
+                name="promo_price"
+                value={formData.promo_price}
+                onChange={handleChange}
+                placeholder="Deixe em branco se sem oferta"
+                className={`w-full bg-slate-50 border ${
+                  errors.promo_price ? 'border-rose-500/50 focus:ring-rose-500/20' : 'border-slate-200 focus:border-[#202020] focus:bg-white'
+                } rounded-xl px-3.5 py-2 text-sm text-slate-800 focus:outline-none focus:ring-1 focus:ring-[#202020]/20 transition-all`}
+              />
+              {errors.promo_price && <span className="text-xs text-rose-500 mt-1 block">{errors.promo_price}</span>}
             </div>
 
             <div>
@@ -204,16 +252,20 @@ export default function ProductFormModal({ isOpen, onClose, productToEdit, onSav
           {/* Row 3: Image URL */}
           <div>
             <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">
-              URL da Imagem
+              URL da Imagem *
             </label>
             <input
               type="text"
               name="image_url"
+              required
               value={formData.image_url}
               onChange={handleChange}
               placeholder="https://exemplo.com/imagem.png"
-              className="w-full bg-slate-50 border border-slate-200 focus:bg-white rounded-xl px-3.5 py-2 text-sm text-slate-800 focus:outline-none focus:border-[#202020] focus:ring-1 focus:ring-[#202020]/20 transition-all"
+              className={`w-full bg-slate-50 border ${
+                errors.image_url ? 'border-rose-500/50 focus:ring-rose-500/20' : 'border-slate-200 focus:border-[#202020] focus:bg-white'
+              } rounded-xl px-3.5 py-2 text-sm text-slate-800 focus:outline-none focus:ring-1 focus:ring-[#202020]/20 transition-all`}
             />
+            {errors.image_url && <span className="text-xs text-rose-500 mt-1 block">{errors.image_url}</span>}
             {formData.image_url && (
               <div className="mt-3 flex items-center gap-3 p-2 bg-slate-50 rounded-xl border border-slate-100">
                 <img

@@ -55,17 +55,16 @@ export default function App() {
       }
       addNotification(`${product.name} adicionado ao carrinho!`, 'success');
       
-      const hasPromo = product.id % 2 === 0;
-      const discountPercent = ((product.id * 3) % 15) + 5;
-      const originalPrice = product.price / (1 - discountPercent / 100);
+      const hasPromo = product.promo_price !== null && product.promo_price !== undefined;
+      const activePrice = hasPromo ? parseFloat(product.promo_price) : parseFloat(product.original_price);
       
       return [
         ...prevCart,
         {
           id: product.id,
           name: product.name,
-          price: product.price,
-          originalPrice: hasPromo ? originalPrice : product.price,
+          price: activePrice,
+          originalPrice: parseFloat(product.original_price),
           hasPromo,
           quantity: 1,
           image: product.image_url,

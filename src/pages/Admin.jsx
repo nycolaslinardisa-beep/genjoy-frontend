@@ -233,7 +233,18 @@ export default function Admin({
 
                     {/* Price */}
                     <td className="px-6 py-4 text-sm font-semibold text-slate-800">
-                      {formatPrice(product.price)}
+                      {product.promo_price ? (
+                        <div className="flex flex-col">
+                          <span className="text-xs text-slate-400 line-through font-normal">
+                            {formatPrice(product.original_price)}
+                          </span>
+                          <span className="text-rose-600 font-bold">
+                            {formatPrice(product.promo_price)}
+                          </span>
+                        </div>
+                      ) : (
+                        formatPrice(product.original_price)
+                      )}
                     </td>
 
                     {/* Stock status badge */}
