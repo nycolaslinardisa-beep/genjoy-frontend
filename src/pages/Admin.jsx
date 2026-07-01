@@ -21,6 +21,7 @@ export default function Admin({
   const [selectedOrderForItems, setSelectedOrderForItems] = useState(null);
   const [orderItems, setOrderItems] = useState([]);
   const [orderItemsLoading, setOrderItemsLoading] = useState(false);
+  const [loadingOrderId, setLoadingOrderId] = useState(null);
 
   const handleTabChange = (newTab) => {
     setActiveTab(newTab);
@@ -65,16 +66,19 @@ export default function Admin({
   };
 
   const handleUpdateOrderStatus = async (orderId, newStatus) => {
+    setLoadingOrderId(orderId);
     try {
       await API.put(`/orders/${orderId}/status`, { status: newStatus });
       addNotification(`Pedido atualizado para ${newStatus}!`, 'success');
       fetchOrders();
-      if (newStatus === 'Concluído' && fetchProducts) {
-        fetchProducts(); // Refresh products list to show decreased stocks!
+      if (fetchProducts) {
+        fetchProducts(); // Refresh products list to show updated stocks!
       }
     } catch (error) {
       console.error('Erro ao atualizar status do pedido:', error);
       addNotification('Erro ao atualizar status do pedido.', 'error');
+    } finally {
+      setLoadingOrderId(null);
     }
   };
 
@@ -314,9 +318,10 @@ export default function Admin({
                         <div className="flex items-center justify-end gap-3">
                           {/* Status dropdown select */}
                           <select
+                            disabled={loadingOrderId === order.id}
                             value={order.status === 'Concluído' ? 'Aprovado' : order.status}
                             onChange={(e) => handleUpdateOrderStatus(order.id, e.target.value)}
-                            className="text-xs font-bold bg-slate-50 border border-slate-200 rounded-xl px-2.5 py-1.5 focus:outline-none focus:ring-1 focus:ring-[#202020]/20 text-slate-700 cursor-pointer"
+                            className="text-xs font-bold bg-slate-50 border border-slate-200 rounded-xl px-2.5 py-1.5 focus:outline-none focus:ring-1 focus:ring-[#202020]/20 text-slate-700 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                           >
                             <option value="Pendente">Pendente</option>
                             <option value="Aprovado">Aprovado</option>
