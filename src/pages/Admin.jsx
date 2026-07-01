@@ -319,13 +319,14 @@ export default function Admin({
 
                           <button
                             onClick={() => handleViewOrderDetails(order)}
-                            className="p-2 rounded-lg text-slate-400 hover:text-slate-850 hover:bg-slate-55 border border-transparent hover:border-slate-200 transition-all cursor-pointer"
+                            className="text-blue-600 hover:text-blue-800 font-medium text-sm ml-3 flex items-center gap-1 transition-colors cursor-pointer"
                             title="Visualizar Detalhes"
                           >
-                            <svg className="w-4.5 h-4.5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <svg className="w-4 h-4 shrink-0" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                               <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
                               <path strokeLinecap="round" strokeLinejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
                             </svg>
+                            <span>Ver Detalhes</span>
                           </button>
                         </div>
                       </td>
