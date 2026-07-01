@@ -125,6 +125,16 @@ export default function Navbar({
               </div>
             )}
 
+            {/* Shopping Cart Icon with Badge */}
+            <div className="relative p-2 text-slate-600 hover:text-black cursor-pointer transition-colors group">
+              <svg className="w-5 h-5 stroke-current group-hover:scale-105 transition-transform" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path>
+              </svg>
+              <span className="absolute -top-1 -right-2 bg-black text-white text-[10px] w-4 h-4 rounded-full flex items-center justify-center font-bold">
+                2
+              </span>
+            </div>
+
             {/* Instagram Link Button */}
             <a
               href="https://www.instagram.com/genjoybr?igsh=MXRncmUwbjlzemt3NA=="
