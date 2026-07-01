@@ -15,12 +15,17 @@ export default function Admin({
   const [deleteLoading, setDeleteLoading] = useState(false);
 
   // Tabs and Orders states
-  const [activeTab, setActiveTab] = useState('produtos');
+  const [activeTab, setActiveTab] = useState(() => localStorage.getItem('admin_active_tab') || 'produtos');
   const [orders, setOrders] = useState([]);
   const [ordersLoading, setOrdersLoading] = useState(false);
   const [selectedOrderForItems, setSelectedOrderForItems] = useState(null);
   const [orderItems, setOrderItems] = useState([]);
   const [orderItemsLoading, setOrderItemsLoading] = useState(false);
+
+  const handleTabChange = (newTab) => {
+    setActiveTab(newTab);
+    localStorage.setItem('admin_active_tab', newTab);
+  };
 
   // 2FA modal states
   const [is2FAOpen, setIs2FAOpen] = useState(false);
@@ -88,9 +93,10 @@ export default function Admin({
   };
 
   useEffect(() => {
-    if (activeTab === 'pedidos') {
-      fetchOrders();
+    if (fetchProducts) {
+      fetchProducts();
     }
+    fetchOrders();
   }, [activeTab]);
 
   // Handle Delete execution
@@ -228,7 +234,7 @@ export default function Admin({
       {/* Tabs Switcher */}
       <div className="flex border-b border-slate-200 mb-6 gap-6">
         <button
-          onClick={() => setActiveTab('produtos')}
+          onClick={() => handleTabChange('produtos')}
           className={`pb-3 font-bold text-sm transition-all focus:outline-none cursor-pointer border-b-2 ${
             activeTab === 'produtos'
               ? 'border-[#202020] text-slate-900'
@@ -238,7 +244,7 @@ export default function Admin({
           Produtos
         </button>
         <button
-          onClick={() => setActiveTab('pedidos')}
+          onClick={() => handleTabChange('pedidos')}
           className={`pb-3 font-bold text-sm transition-all focus:outline-none cursor-pointer border-b-2 ${
             activeTab === 'pedidos'
               ? 'border-[#202020] text-slate-900'
