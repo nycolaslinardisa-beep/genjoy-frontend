@@ -365,7 +365,7 @@ export default function Admin({
                   </svg>
                   <div>
                     <h4 className="font-bold text-sm text-emerald-800">A proteção 2FA está ativa!</h4>
-                    <p className="text-xs text-emerald-650 mt-0.5">
+                    <p className="text-xs text-emerald-600 mt-0.5">
                       Sua conta está protegida por verificação de duas etapas. O login exigirá a verificação do código de segurança de 6 dígitos.
                     </p>
                   </div>
@@ -374,7 +374,7 @@ export default function Admin({
                 <hr className="border-slate-100 my-4" />
 
                 <form onSubmit={handleDisable2FA} className="space-y-4">
-                  <div className="text-slate-650 text-xs leading-relaxed">
+                  <div className="text-slate-500 text-xs leading-relaxed">
                     Para <strong>desativar</strong> o 2FA, insira o código atual de 6 dígitos gerado pelo aplicativo Google Authenticator no seu celular.
                   </div>
                   <div>

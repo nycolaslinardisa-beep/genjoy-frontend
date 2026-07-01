@@ -80,14 +80,13 @@ export default function Navbar({
 
           {/* Right Action Icons */}
           <div className="flex items-center gap-2 sm:gap-4 shrink-0">
-
             {/* Admin toggle button */}
             <button
               onClick={() => setCurrentTab(currentTab === 'admin' ? 'catalog' : 'admin')}
-              className={`p-2 rounded-full border transition-all duration-200 ${
+              className={`p-2 rounded-full border flex items-center justify-center transition-all duration-200 ${
                 currentTab === 'admin'
                   ? 'bg-black text-white border-black'
-                  : 'bg-white text-slate-650 hover:text-black border-transparent hover:bg-slate-50'
+                  : 'bg-white text-slate-600 hover:text-black border-transparent hover:bg-slate-50'
               }`}
               title={currentTab === 'admin' ? 'Ver Catálogo' : 'Painel Administrativo'}
             >
@@ -126,22 +125,12 @@ export default function Navbar({
               </div>
             )}
 
-            {/* Shopping Cart Icon with Badge */}
-            <div className="relative p-2 text-slate-600 hover:text-black cursor-pointer transition-colors group">
-              <svg className="w-5.5 h-5.5 stroke-current group-hover:scale-105 transition-transform" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path>
-              </svg>
-              <span className="absolute top-0 right-0 w-4.5 h-4.5 bg-black text-white text-[9px] font-bold rounded-full flex items-center justify-center">
-                2
-              </span>
-            </div>
-
             {/* Instagram Link Button */}
             <a
               href="https://www.instagram.com/genjoybr?igsh=MXRncmUwbjlzemt3NA=="
               target="_blank"
               rel="noopener noreferrer"
-              className="p-2 text-slate-650 hover:text-black transition-colors hidden md:inline-flex"
+              className="p-2 text-slate-600 hover:text-black transition-colors hidden md:inline-flex items-center justify-center"
               title="Siga-nos no Instagram"
             >
               <svg className="w-5 h-5 stroke-current" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -156,11 +145,11 @@ export default function Navbar({
               href="https://wa.me/556499731390"
               target="_blank"
               rel="noopener noreferrer"
-              className="p-2 text-slate-655 hover:text-emerald-600 transition-colors hidden md:inline-flex"
+              className="p-2 text-slate-600 hover:text-emerald-600 transition-colors hidden md:inline-flex items-center justify-center"
               title="Fale conosco no WhatsApp"
             >
               <svg className="w-5 h-5 fill-current" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946C.06 5.348 5.397.01 12.008.01c3.202.001 6.212 1.246 8.477 3.514 2.266 2.268 3.507 5.28 3.505 8.484-.004 6.657-5.34 11.997-11.953 11.997-2.005-.001-3.973-.502-5.731-1.456L0 24zm6.59-4.846c1.6.95 3.188 1.449 4.825 1.451 5.436 0 9.86-4.37 9.864-9.799.002-2.623-1.023-5.086-2.884-6.948C16.59 1.993 14.137.973 11.52.973c-5.437 0-9.862 4.371-9.866 9.8.001 2.012.528 3.976 1.529 5.701L2.17 20.25l4.477-1.096zM18.06 14.93c-.33-.165-1.937-.957-2.235-1.066-.298-.108-.515-.162-.73.163-.215.325-.83.163-1.018-.163-.188-.329-.374-.637-.56-.967-.188-.33-.037-.506.126-.671.148-.15.33-.325.495-.49.165-.163.22-.271.33-.453.11-.183.055-.343-.028-.507-.082-.165-.73-1.761-1-2.414-.263-.637-.531-.55-.73-.56h-.627c-.215 0-.565.081-.861.408-.296.325-1.13 1.101-1.13 2.685 0 1.586 1.147 3.117 1.308 3.333.16.217 2.258 3.447 5.47 4.832.763.329 1.358.525 1.821.672.766.244 1.464.21 2.017.127.616-.092 1.937-.792 2.21-1.558.271-.767.271-1.425.19-1.557-.08-.135-.297-.217-.627-.38z" />
+                <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L0 24l6.335-1.662c1.746.953 3.71 1.458 5.704 1.459h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" />
               </svg>
             </a>
           </div>
