@@ -290,9 +290,9 @@ export default function Admin({
                         {formatPrice(order.total_price)}
                       </td>
                       <td className="px-6 py-4">
-                        {order.status === 'Concluído' ? (
+                        {order.status === 'Aprovado' || order.status === 'Concluído' ? (
                           <span className="inline-flex items-center text-xs font-semibold px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-100">
-                            Concluído
+                            Aprovado
                           </span>
                         ) : order.status === 'Cancelado' ? (
                           <span className="inline-flex items-center text-xs font-semibold px-2.5 py-0.5 rounded-full bg-rose-50 text-rose-700 border border-rose-100">
@@ -305,7 +305,18 @@ export default function Admin({
                         )}
                       </td>
                       <td className="px-6 py-4 text-right">
-                        <div className="flex items-center justify-end gap-2">
+                        <div className="flex items-center justify-end gap-3">
+                          {/* Status dropdown select */}
+                          <select
+                            value={order.status === 'Concluído' ? 'Aprovado' : order.status}
+                            onChange={(e) => handleUpdateOrderStatus(order.id, e.target.value)}
+                            className="text-xs font-bold bg-slate-50 border border-slate-200 rounded-xl px-2.5 py-1.5 focus:outline-none focus:ring-1 focus:ring-[#202020]/20 text-slate-700 cursor-pointer"
+                          >
+                            <option value="Pendente">Pendente</option>
+                            <option value="Aprovado">Aprovado</option>
+                            <option value="Cancelado">Cancelado</option>
+                          </select>
+
                           <button
                             onClick={() => handleViewOrderDetails(order)}
                             className="p-2 rounded-lg text-slate-400 hover:text-slate-850 hover:bg-slate-55 border border-transparent hover:border-slate-200 transition-all cursor-pointer"
@@ -316,17 +327,6 @@ export default function Admin({
                               <path strokeLinecap="round" strokeLinejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
                             </svg>
                           </button>
-                          {order.status === 'Pendente' && (
-                            <button
-                              onClick={() => handleUpdateOrderStatus(order.id, 'Concluído')}
-                              className="p-2 rounded-lg text-slate-400 hover:text-emerald-600 hover:bg-emerald-50 border border-transparent hover:border-emerald-100 transition-all cursor-pointer"
-                              title="Aprovar Pedido e dar baixa no Estoque"
-                            >
-                              <svg className="w-4.5 h-4.5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7"></path>
-                              </svg>
-                            </button>
-                          )}
                         </div>
                       </td>
                     </tr>
