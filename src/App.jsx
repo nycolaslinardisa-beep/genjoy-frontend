@@ -257,29 +257,27 @@ export default function App() {
       </a>
 
       {/* Premium Toast Notifications Container */}
-      <div className="fixed bottom-5 right-5 z-50 flex flex-col gap-2 max-w-sm w-full">
+      <div className="fixed bottom-24 left-4 right-4 md:right-6 md:left-auto max-w-sm w-[calc(100%-2rem)] z-50 flex flex-col gap-2">
         {notifications.map((n) => (
           <div
             key={n.id}
-            className={`glass p-4 rounded-xl shadow-lg border flex items-start gap-3 transition-all duration-300 transform translate-y-0 animate-slide-in ${
-              n.type === 'success'
-                ? 'border-emerald-200 text-emerald-800 bg-emerald-50'
-                : 'border-rose-200 text-rose-800 bg-rose-50'
+            className={`shadow-2xl rounded-xl p-4 flex items-center gap-3 animate-slide-in text-white ${
+              n.type === 'success' ? 'bg-emerald-600' : 'bg-rose-600'
             }`}
           >
             {n.type === 'success' ? (
-              <svg className="w-5 h-5 mt-0.5 shrink-0 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <svg className="w-5 h-5 shrink-0 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
               </svg>
             ) : (
-              <svg className="w-5 h-5 mt-0.5 shrink-0 text-rose-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <svg className="w-5 h-5 shrink-0 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
               </svg>
             )}
-            <div className="flex-1 text-sm font-medium">{n.message}</div>
+            <div className="flex-grow text-sm font-semibold">{n.message}</div>
             <button
               onClick={() => setNotifications((prev) => prev.filter((item) => item.id !== n.id))}
-              className="text-slate-400 hover:text-slate-600 shrink-0"
+              className="text-white/80 hover:text-white shrink-0 cursor-pointer"
             >
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"></path>

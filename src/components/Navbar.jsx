@@ -359,11 +359,13 @@ export default function Navbar({
                       </span>
                     </div>
                     
-                    {/* Simulate promotions / discount if has any items with promo */}
+                    {/* Discount section */}
                     {cartDiscount > 0 && (
-                      <div className="flex justify-between text-emerald-600">
-                        <span>Desconto Promoções (Simulado)</span>
-                        <span>
+                      <div className="flex justify-between items-center py-1">
+                        <span className="text-emerald-700 font-bold bg-emerald-50 px-2 py-1 rounded-lg text-xs animate-pulse">
+                          Você Economiza:
+                        </span>
+                        <span className="text-emerald-600 font-extrabold text-sm">
                           -{formatPrice(cartDiscount)}
                         </span>
                       </div>
