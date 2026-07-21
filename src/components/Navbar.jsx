@@ -15,7 +15,8 @@ export default function Navbar({
   cart = [],
   updateQuantity,
   removeFromCart,
-  clearCart
+  clearCart,
+  addNotification
 }) {
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [checkoutLoading, setCheckoutLoading] = useState(false);
@@ -407,7 +408,25 @@ export default function Navbar({
                         setIsCartOpen(false);
                       } catch (error) {
                         console.error('Erro ao finalizar compra:', error);
-                        alert('Ocorreu um erro ao processar o seu pedido no servidor. Tente novamente.');
+                        if (error.response && error.response.status === 400) {
+                          try {
+                            const prodResponse = await API.get('/products');
+                            const serverProductIds = new Set(prodResponse.data.map(p => p.id));
+                            
+                            const invalidItems = cart.filter(item => !serverProductIds.has(item.id));
+                            invalidItems.forEach(item => removeFromCart(item.id));
+                          } catch (fetchError) {
+                            console.error('Erro ao buscar produtos atualizados:', fetchError);
+                          }
+                          
+                          if (addNotification) {
+                            addNotification('Alguns produtos do seu carrinho não estão mais disponíveis e foram removidos.', 'error');
+                          } else {
+                            alert('Alguns produtos do seu carrinho não estão mais disponíveis e foram removidos.');
+                          }
+                        } else {
+                          alert('Ocorreu um erro ao processar o seu pedido no servidor. Tente novamente.');
+                        }
                       } finally {
                         setCheckoutLoading(false);
                       }

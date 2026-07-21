@@ -193,6 +193,7 @@ export default function App() {
         updateQuantity={updateQuantity}
         removeFromCart={removeFromCart}
         clearCart={clearCart}
+        addNotification={addNotification}
       />
 
       {/* Pages Container */}
